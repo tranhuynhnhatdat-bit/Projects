@@ -143,4 +143,7 @@ def market_analyzer(file, asset):
     visualization(df, asset)
 
 
-market_analyzer("Data\\2026.6.19GBPUSD_ftmo-D1-GBPUSD_ftmo.csv", "GBP/USD")
+market_analyzer(
+    r"C:\Users\Mr.Dat\Desktop\Projects\Data\2026.6.19GBPUSD_ftmo-D1-GBPUSD_ftmo.csv",
+    "GBP/USD",
+)
