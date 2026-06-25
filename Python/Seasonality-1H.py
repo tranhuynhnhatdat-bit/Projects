@@ -163,9 +163,7 @@ def analyze_intraday_seasonality(file_path):
     plt.tight_layout()
     plt.show()
 
-    return df
-
 
 analyze_intraday_seasonality(
-    r"C:\Users\Mr.Dat\Desktop\Projects\Data\2026.6.23GBPUSD_ftmo-H1-Forex_247.csv"
+    r"C:\Users\Mr.Dat\Desktop\Projects\Data\2026.6.25XAUUSD_ftmo-H1-Forex_245.csv"
 )
