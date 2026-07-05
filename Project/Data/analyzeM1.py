@@ -160,14 +160,18 @@ def clean_data_M1(
     """
     signal_kwargs = signal_kwargs or {}
     feature_kwargs = feature_kwargs or {}
-
-    df_m1 = pd.read_csv(
-        file,
-        names=["Datetime", "Open", "High", "Low", "Close"],
-        index_col=0,
-        parse_dates=True,
-        header=None,
-    )
+    base_df = pd.read_csv(file)
+    columns = ["Datetime"]
+    if columns not in base_df.columns.tolist():
+        df_m1 = pd.read_csv(
+            file,
+            names=["Datetime", "Open", "High", "Low", "Close"],
+            index_col=0,
+            parse_dates=True,
+            header=None,
+        )
+    else:
+        df_m1 = pd.read_csv(file, index_col=0, parse_dates=True)
 
     if df_m1.empty:
         raise ValueError(f"No data loaded from '{file}'. Check the file path/contents.")
