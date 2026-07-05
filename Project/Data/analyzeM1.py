@@ -47,9 +47,9 @@ import pandas_ta as ta
 class SignalConfig:
     """Configuration for `default_signal_func`."""
 
-    required_times: Sequence[Tuple[int, int]] = ((1, 0), (9, 0))
-    buy_time: Tuple[int, int] = (1, 0)
-    sell_time: Tuple[int, int] = (9, 0)
+    required_times: Sequence[Tuple[int, int]] = ((1, 5), (9, 5))
+    buy_time: Tuple[int, int] = (1, 5)
+    sell_time: Tuple[int, int] = (9, 5)
 
 
 def default_signal_func(
@@ -160,18 +160,14 @@ def clean_data_M1(
     """
     signal_kwargs = signal_kwargs or {}
     feature_kwargs = feature_kwargs or {}
-    base_df = pd.read_csv(file)
-    columns = ["Datetime"]
-    if columns not in base_df.columns.tolist():
-        df_m1 = pd.read_csv(
-            file,
-            names=["Datetime", "Open", "High", "Low", "Close"],
-            index_col=0,
-            parse_dates=True,
-            header=None,
-        )
-    else:
-        df_m1 = pd.read_csv(file, index_col=0, parse_dates=True)
+
+    df_m1 = pd.read_csv(
+        file,
+        names=["Datetime", "Open", "High", "Low", "Close"],
+        index_col=0,
+        parse_dates=True,
+        header=None,
+    )
 
     if df_m1.empty:
         raise ValueError(f"No data loaded from '{file}'. Check the file path/contents.")
@@ -281,3 +277,57 @@ def cleaning_backtest(stats, df_m1, df_1h, drop_columns=None):
         )
 
     return trades, df_m1, df_1h, labeled
+
+
+def clean_data_mt5_m1(
+    file,
+    signal_func: Callable[..., pd.DataFrame] = default_signal_func,
+    feature_func: Callable[..., pd.DataFrame] = default_feature_func,
+    signal_kwargs: Optional[dict] = None,
+    feature_kwargs: Optional[dict] = None,
+):
+    """
+    Load a raw M1 OHLC csv, generate trade signals, and build hourly/daily
+    features.
+
+    Parameters
+    ----------
+    file : str | Path
+        Path to the M1 OHLC CSV file (columns: Datetime, Open, High, Low, Close).
+    signal_func : callable, optional
+        `signal_func(df_m1, **signal_kwargs) -> df_m1` with a "Signal" column.
+        Defaults to `default_signal_func`.
+    feature_func : callable, optional
+        `feature_func(df_h1, **feature_kwargs) -> df_h1` with extra feature
+        columns. Defaults to `default_feature_func`.
+    signal_kwargs, feature_kwargs : dict, optional
+        Extra keyword arguments forwarded to `signal_func` / `feature_func`.
+
+    Returns
+    -------
+    df_m1, df_h1, df_D : pd.DataFrame
+    """
+    signal_kwargs = signal_kwargs or {}
+    feature_kwargs = feature_kwargs or {}
+
+    df_m1 = pd.read_csv(file, index_col=0, parse_dates=True)
+
+    df_m1["Weekday"] = df_m1.index.day_name()
+    df_m1["Hour"] = df_m1.index.hour
+    df_m1["Minute"] = df_m1.index.minute
+
+    df_m1 = signal_func(df_m1, **signal_kwargs)
+    if "Signal" not in df_m1.columns:
+        raise ValueError("signal_func must return a DataFrame with a 'Signal' column.")
+
+    df_h1 = df_m1.resample("1h").agg(
+        {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+    )
+    df_h1 = feature_func(df_h1, **feature_kwargs)
+
+    df_D = df_m1.resample("D").agg(
+        {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+    )
+    df_D["Return"] = df_D["Close"].pct_change()
+
+    return df_m1, df_h1, df_D
