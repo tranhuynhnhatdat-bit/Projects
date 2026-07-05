@@ -1,0 +1,169 @@
+model_name,sharpe,num_trades,prob_thres,model
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.7755138230708, class_weight='balanced', max_iter=1744,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.844356152620849, class_weight='balanced', max_iter=1967,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.989524989231924, class_weight='balanced', max_iter=544,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=0.09730517983592225, class_weight='balanced',
+                   max_iter=1069, random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.578994492018132, class_weight='balanced', max_iter=1938,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.434261015460348, class_weight='balanced', max_iter=1881,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.947786198062521, class_weight='balanced', max_iter=1984,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=3.6965858399643654, class_weight='balanced', max_iter=1983,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.922350671970169, class_weight='balanced', max_iter=1907,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.816027527393484, class_weight='balanced', max_iter=1884,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.518137982191155, class_weight='balanced', max_iter=1766,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.758592161648214, class_weight='balanced', max_iter=1995,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.4,"LogisticRegression(C=0.0986286334705917, class_weight='balanced', max_iter=731,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.4,"LogisticRegression(C=0.18777049549663666, class_weight='balanced', max_iter=791,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.4,"LogisticRegression(C=0.06570172850629152, class_weight='balanced', max_iter=544,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.4378797759667705, class_weight='balanced', max_iter=1983,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=3.563469760993443, class_weight='balanced', max_iter=1462,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.747648180489749, class_weight='balanced', max_iter=1586,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.35,"LogisticRegression(C=1.6973754588286136, class_weight='balanced', max_iter=1628,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.4,"LogisticRegression(C=0.07974630929710332, class_weight='balanced', max_iter=522,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.2993239058532815, class_weight='balanced', max_iter=1972,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.35,"LogisticRegression(C=0.33594824197039796, class_weight='balanced',
+                   max_iter=1790, random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.35,"LogisticRegression(C=0.3734681125597423, class_weight='balanced', max_iter=1959,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.471522751077944, class_weight='balanced', max_iter=1974,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.675705043163179, class_weight='balanced', max_iter=1851,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.687000333433745, class_weight='balanced', max_iter=1835,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.696975510071324, class_weight='balanced', max_iter=1819,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=3.629170276252741, class_weight='balanced', max_iter=1825,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.97693885920603, class_weight='balanced', max_iter=1926,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.955567875723629, class_weight='balanced', max_iter=1902,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.971416297255295, class_weight='balanced', max_iter=1931,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.989846686706261, class_weight='balanced', max_iter=1918,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.345949143899638, class_weight='balanced', max_iter=1004,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=1.0852362724863038, class_weight='balanced', max_iter=1832,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.719755383393661, class_weight='balanced', max_iter=1892,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.734027376714496, class_weight='balanced', max_iter=1860,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.9968989077035655, class_weight='balanced', max_iter=1919,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.289828725802965, class_weight='balanced', max_iter=1927,
+                   random_state=42)"
+LogisticRegression,0.4740264616553651,4276,0.3,"LogisticRegression(C=4.971463588232121, class_weight='balanced', max_iter=1920,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=3.5049114268680572, class_weight='balanced', max_iter=1568,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=4.172648781805998, class_weight='balanced', max_iter=1771,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=3.6287513036517307, class_weight='balanced', max_iter=1136,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=3.0918322311823303, class_weight='balanced', max_iter=1201,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.7148488655541363, class_weight='balanced', max_iter=1238,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.8174942820062467, class_weight='balanced', max_iter=1148,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.8193806394959244, class_weight='balanced', max_iter=1683,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.8580810831869172, class_weight='balanced', max_iter=1742,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=3.155207037665532, class_weight='balanced', max_iter=1746,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.8292039757180807, class_weight='balanced', max_iter=1736,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.9930430969362884, class_weight='balanced', max_iter=1357,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.939008509510657, class_weight='balanced', max_iter=1775,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.7064078189454257, class_weight='balanced', max_iter=1205,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=3.6085367208635604, class_weight='balanced', max_iter=1226,
+                   random_state=42)"
+LogisticRegression,0.45430472369730324,4274,0.35,"LogisticRegression(C=2.4436146038216795, class_weight='balanced', max_iter=1796,
+                   random_state=42)"
+LogisticRegression,0.454251237514971,4275,0.35,"LogisticRegression(C=2.130849835622655, class_weight='balanced', max_iter=1795,
+                   random_state=42)"
+LogisticRegression,0.454251237514971,4275,0.35,"LogisticRegression(C=2.4379658882524358, class_weight='balanced', max_iter=1335,
+                   random_state=42)"
+LogisticRegression,0.454251237514971,4275,0.35,"LogisticRegression(C=1.7884575527479671, class_weight='balanced', max_iter=1223,
+                   random_state=42)"
+LogisticRegression,0.454251237514971,4275,0.35,"LogisticRegression(C=1.7664548433459926, class_weight='balanced', max_iter=1196,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.8386763808879385, class_weight='balanced', max_iter=1491,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.573260294631252, class_weight='balanced', max_iter=1773,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.575134460390825, class_weight='balanced', max_iter=1676,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.835118082074855, class_weight='balanced', max_iter=1786,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.824074307353484, class_weight='balanced', max_iter=1686,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.299283599538451, class_weight='balanced', max_iter=1676,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.488926723864563, class_weight='balanced', max_iter=1679,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.310102566020283, class_weight='balanced', max_iter=1989,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.503368132148724, class_weight='balanced', max_iter=642,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.505274716553768, class_weight='balanced', max_iter=647,
+                   random_state=42)"
+LogisticRegression,0.4396406048960915,4258,0.4,"LogisticRegression(C=4.518774219052855, class_weight='balanced', max_iter=650,
+                   random_state=42)"
+LogisticRegression,0.4331801329649405,4261,0.4,"LogisticRegression(C=3.969671910685595, class_weight='balanced', max_iter=787,
+                   random_state=42)"
+LogisticRegression,0.4331801329649405,4261,0.4,"LogisticRegression(C=3.9919749228732564, class_weight='balanced', max_iter=537,
+                   random_state=42)"
+LogisticRegression,0.4331801329649405,4261,0.4,"LogisticRegression(C=4.06603620169601, class_weight='balanced', max_iter=794,
+                   random_state=42)"
+LogisticRegression,0.4331801329649405,4261,0.4,"LogisticRegression(C=4.046979522672956, class_weight='balanced', max_iter=507,
+                   random_state=42)"
+LogisticRegression,0.4325840827279996,4067,0.45,"LogisticRegression(C=3.9864571389295813, class_weight='balanced', max_iter=575,
+                   random_state=42)"
+LogisticRegression,0.4324400933820106,4260,0.4,"LogisticRegression(C=4.1330301064647, class_weight='balanced', max_iter=849,
+                   random_state=42)"
+LogisticRegression,0.4301354671227672,4268,0.4,"LogisticRegression(C=2.465957932150045, class_weight='balanced', max_iter=1553,
+                   random_state=42)"
+LogisticRegression,0.4301354671227672,4268,0.4,"LogisticRegression(C=2.364947413771294, class_weight='balanced', max_iter=1779,
+                   random_state=42)"
+LogisticRegression,0.42872942520057783,4061,0.45,"LogisticRegression(C=4.103959733355866, class_weight='balanced', max_iter=880,
+                   random_state=42)"
+LogisticRegression,0.42870030526808856,4062,0.45,"LogisticRegression(C=4.049963091959496, class_weight='balanced', max_iter=892,
+                   random_state=42)"
+LogisticRegression,0.42828190552058953,4272,0.4,"LogisticRegression(C=1.514093798760253, class_weight='balanced', max_iter=1093,
+                   random_state=42)"
+LogisticRegression,0.42729576353769766,4063,0.45,"LogisticRegression(C=4.034574476249161, class_weight='balanced', max_iter=510,
+                   random_state=42)"
+LogisticRegression,0.427242387403644,4273,0.35,"LogisticRegression(C=4.7980175448660916, class_weight='balanced', max_iter=1693,
+                   random_state=42)"
+LogisticRegression,0.4204515490556323,4091,0.45,"LogisticRegression(C=2.665321124251396, class_weight='balanced', max_iter=582,
+                   random_state=42)"
+LogisticRegression,0.4132262656868039,4085,0.45,"LogisticRegression(C=2.977303675435227, class_weight='balanced', max_iter=508,
+                   random_state=42)"
