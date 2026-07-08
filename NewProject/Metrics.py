@@ -142,6 +142,28 @@ class Asset_Metrics:
             print(f"Return/Drawdown Ratio: {return_dd:.2}")
         return return_dd
 
+    def __str__(self) -> str:
+        """Print all asset metrics in a formatted table."""
+        lines = [
+            "=" * 67,
+            "  Asset Metrics",
+            "=" * 67,
+            f"  Column:                        {self._column}",
+            f"  Sharpe Ratio:                  {self.sharpe_ratio():>8.2f}",
+            f"  Sortino Ratio:                 {self.sortino_ratio():>8.2f}",
+            f"  Maximum Drawdown:              {self.maximum_dd() * 100:>7.2f}%",
+            f"  Total Return:                  {self.total_return() * 100:>7.2f}%",
+            f"  CAGR:                          {self.CAGR() * 100:>7.2f}%",
+            f"  Annualized Volatility:         {self.annualized_volatility() * 100:>7.2f}%",
+            f"  Profit Factor:                 {self.profit_factor():>8.2f}",
+            f"  Win Rate:                      {self.win_rate() * 100:>7.2f}%",
+            f"  Expectancy:                    {self.expectancy() * 100:>7.2f}%",
+            f"  Max Stagnation Days:           {self.max_stagnation_days():>8}",
+            f"  Return/Drawdown Ratio:         {self.return_drawdown_ratio():>8.2f}",
+            "=" * 67,
+        ]
+        return "\n".join(lines)
+
 
 class Trade_Metrics:
     def __init__(
@@ -447,6 +469,12 @@ if __name__ == "__main__":
 
     bt = Backtest(df, SeasonalityStrategy, cash=10000, margin=0.01)
     stats = bt.run()
+
+    # Test Asset_Metrics with __str__
+    metrics = Asset_Metrics(df, "Close")
+    print(metrics)
+
+    print()
 
     # Test Trade_Metrics with __str__
     trade_metrics = Trade_Metrics(
