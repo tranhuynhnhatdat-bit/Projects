@@ -162,7 +162,24 @@ class Asset_Metrics:
             f"  Return/Drawdown Ratio:         {self.return_drawdown_ratio():>8.2f}",
             "=" * 67,
         ]
+        self.plot()
         return "\n".join(lines)
+
+    def plot(self) -> None:
+        """Plot the daily OHLC close price chart (resampled from any timeframe)."""
+        import matplotlib.pyplot as plt
+
+        ohlc_cols = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+        daily_ohlc = self._df.resample("D").agg(ohlc_cols).dropna()
+
+        plt.figure(figsize=(12, 6))
+        plt.plot(daily_ohlc.index, daily_ohlc["Close"], label=f"Close ({self._column})")
+        plt.title("Asset Price (Daily)")
+        plt.xlabel("Date")
+        plt.ylabel("Price")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 
 class Trade_Metrics:
@@ -427,7 +444,33 @@ class Trade_Metrics:
             f"  Average Holding Time:          {self.average_holding_time}",
             "=" * 67,
         ]
+        self.plot()
         return "\n".join(lines)
+
+    def plot(self) -> None:
+        """Plot two charts side-by-side: asset close price and exit equity curve."""
+        import matplotlib.pyplot as plt
+
+        ohlc_cols = {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+        daily_ohlc = self._asset_df.resample("D").agg(ohlc_cols).dropna()
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+        ax1.plot(daily_ohlc.index, daily_ohlc["Close"])
+        ax1.set_title("Asset Close Price (Daily)")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Price")
+        ax1.grid(True)
+
+        exit_equity = self.exit_equity
+        ax2.plot(exit_equity.index, exit_equity.values)
+        ax2.set_title("Equity Curve (Exit-based)")
+        ax2.set_xlabel("Date")
+        ax2.set_ylabel("Equity ($)")
+        ax2.grid(True)
+
+        plt.tight_layout()
+        plt.show()
 
 
 # ============================================================
@@ -440,7 +483,7 @@ if __name__ == "__main__":
         index_col=0,
         parse_dates=True,
     )
-    required_times = [0, 8]
+    required_times = [0, 1, 8, 9]
     valid_days = set()
     for date, group in df.groupby(df.index.date):
         times = set(group.index.hour)
@@ -451,8 +494,8 @@ if __name__ == "__main__":
     df["Valid_Day"] = date_series.map(lambda date: date in valid_days)
     df["Signal"] = 0
 
-    buy = (df["Valid_Day"]) & (df.index.hour == 1)
-    sell = df.index.hour == 9
+    buy = (df["Valid_Day"]) & (df.index.hour == 0)
+    sell = df.index.hour == 8
     df.loc[buy, "Signal"] = 1
     df.loc[sell, "Signal"] = -1
 
