@@ -195,7 +195,7 @@ trades_pnl = trades_pnl.loc[inputs.index]
 
 # 3. Walk-forward optimization on unscaled data
 fold_results_df = run_walk_forward_optimization(
-    inputs, targets, trades_pnl, train_size=0.4, n_trials=20
+    inputs, targets, trades_pnl, train_size=0.4, n_trials=5
 )
 summary, best_model = summarize_fold_results(fold_results_df)
 
@@ -204,7 +204,7 @@ inputs_scaled, scaler = scale_inputs(inputs)
 
 # 5. Final optimization on scaled data
 results_df, final_model, model_prob_thres, model_sharpe = run_final_optimization(
-    best_model, inputs_scaled, targets, trades_pnl, n_trials=20
+    best_model, inputs_scaled, targets, trades_pnl, n_trials=5
 )
 
 # 6. Compute equity curves (uses scaled data for prediction)
