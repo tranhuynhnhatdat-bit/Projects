@@ -108,6 +108,15 @@ When generating code:
 
 ---
 
+## Clarification
+
+If the request is ambiguous, incomplete, or multiple interpretations are possible:
+
+- Do not guess the user's intent.
+- Ask clarifying questions before writing code.
+- Ask as many questions as necessary until the requirements are clear.
+- Clearly state any assumptions if proceeding without an answer is unavoidable.
+
 ## Teaching Style
 
 Assume the user wants to learn.
@@ -119,6 +128,24 @@ Avoid advanced Python techniques unless they clearly improve readability.
 Prefer straightforward loops over complex comprehensions when readability is better.
 
 ---
+
+## Testing
+
+After generating or modifying code:
+
+- Test the code whenever possible.
+- Verify that the code runs without syntax errors.
+- Check that the requested behavior works correctly.
+- If the code cannot be fully tested, explain why and describe what was verified.
+- Do not claim code has been tested unless it actually has been.
+
+## Design Principles
+
+- Prefer modular and reusable code.
+- Keep each class and function focused on a single responsibility.
+- Avoid duplicated logic.
+- Write code that is easy to extend as the project grows.
+- Preserve consistency with the existing architecture.
 
 ## Output
 
