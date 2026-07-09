@@ -296,14 +296,88 @@ class Seasonality:
 
         return significant
 
-    def stats_session(self, visualization: bool = False):
+    def stats_session(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Session")
         print(significant.head(10))
+
+        if plot:
+            # Order sessions properly
+            session_order = ["Asian", "London", "Overlap", "New York"]
+            stats["Group"] = pd.Categorical(
+                stats["Group"], categories=session_order, ordered=True
+            )
+            stats = stats.sort_values("Group")
+
+            fig, ax = plt.subplots(2, 2, figsize=(12, 6))
+
+            ax[0, 0].plot(stats["Group"], stats["Mean Return %"], marker="o")
+            ax[0, 0].axhline(0, linestyle="--", color="gray")
+            ax[0, 0].set_title("Mean Return by Session (Line)")
+            ax[0, 0].set_ylabel("Mean Return %")
+            ax[0, 0].grid(True)
+            ax[0, 0].tick_params(axis="x", rotation=45)
+
+            ax[0, 1].plot(stats["Group"], stats["Median Return %"], marker="o")
+            ax[0, 1].axhline(0, linestyle="--", color="gray")
+            ax[0, 1].set_title("Median Return by Session (Line)")
+            ax[0, 1].set_ylabel("Median Return %")
+            ax[0, 1].grid(True)
+            ax[0, 1].tick_params(axis="x", rotation=45)
+
+            ax[1, 0].bar(stats["Group"], stats["Mean Return %"])
+            ax[1, 0].axhline(0, linestyle="--", color="gray")
+            ax[1, 0].set_title("Mean Return by Session (Bar)")
+            ax[1, 0].set_ylabel("Mean Return %")
+            ax[1, 0].grid(True)
+            ax[1, 0].tick_params(axis="x", rotation=45)
+
+            ax[1, 1].bar(stats["Group"], stats["Median Return %"])
+            ax[1, 1].axhline(0, linestyle="--", color="gray")
+            ax[1, 1].set_title("Median Return by Session (Bar)")
+            ax[1, 1].set_ylabel("Median Return %")
+            ax[1, 1].grid(True)
+            ax[1, 1].tick_params(axis="x", rotation=45)
+
+            plt.tight_layout()
+            plt.show()
+
         return significant
 
-    def stats_session_hour(self, visualization: bool = False):
+    def stats_session_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Hour"])
         print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Session", "Hour"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Pivot for heatmap
+            session_order = ["Asian", "London", "New York", "Overlap"]
+            pivot = stats.pivot_table(
+                values="Mean Return %",
+                index="Hour",
+                columns="Session",
+                aggfunc="first",
+            )
+            pivot = pivot[session_order]
+
+            fig, ax = plt.subplots(figsize=(12, 8))
+            sns.heatmap(
+                pivot,
+                cmap="RdYlGn",
+                center=0,
+                annot=True,
+                fmt=".3f",
+                ax=ax,
+            )
+            ax.set_title("Mean Return % by Session and Hour")
+            ax.set_xlabel("Session")
+            ax.set_ylabel("Hour")
+            plt.tight_layout()
+            plt.show()
+
         return significant
 
     def stats_session_weekday(self, visualization: bool = False):
