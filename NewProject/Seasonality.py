@@ -85,8 +85,9 @@ class Seasonality:
                 }
             )
 
-        stats = pd.DataFrame(results).sort_values("T-stats", key=abs, ascending=False)
+        stats = pd.DataFrame(results)
         significant = stats[(abs(stats["T-stats"]) > 2) & (stats["P-value"] < 0.05)]
+        significant = significant.sort_values("T-stats", key=abs, ascending=False)
         return significant, stats
 
     def stats_hour(self, plot: bool = False):
@@ -124,7 +125,7 @@ class Seasonality:
         if plot:
             # Order weekdays properly
             weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-            stats = stats[stats["Group"].isin(weekday_order)]
+
             stats["Group"] = pd.Categorical(
                 stats["Group"], categories=weekday_order, ordered=True
             )
@@ -202,14 +203,67 @@ class Seasonality:
 
         return significant
 
-    def stats_month(self, visualization: bool = False):
+    def stats_month(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Month")
         print(significant.head(10))
+
+        if plot:
+            fig, ax = plt.subplots(1, 2, figsize=(12, 8))
+
+            ax[0].plot(stats["Group"], stats["Mean Return %"], marker="o")
+            ax[0].axhline(0, linestyle="--", color="gray")
+            ax[0].set_title("Mean Return by Month")
+            ax[0].set_xlabel("Month")
+            ax[0].set_ylabel("Mean Return %")
+            ax[0].set_xticks(range(1, 13))
+            ax[0].grid(True)
+
+            ax[1].plot(stats["Group"], stats["Median Return %"], marker="o")
+            ax[1].axhline(0, linestyle="--", color="gray")
+            ax[1].set_title("Median Return by Month")
+            ax[1].set_xlabel("Month")
+            ax[1].set_ylabel("Median Return %")
+            ax[1].set_xticks(range(1, 13))
+            ax[1].grid(True)
+
+            plt.tight_layout()
+            plt.show()
+
         return significant
 
-    def stats_month_day(self, visualization: bool = False):
+    def stats_month_day(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Day"])
         print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Month", "Day"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Pivot for heatmap
+            pivot = stats.pivot_table(
+                values="Mean Return %",
+                index="Day",
+                columns="Month",
+                aggfunc="first",
+            )
+
+            fig, ax = plt.subplots(figsize=(14, 8))
+            sns.heatmap(
+                pivot,
+                cmap="RdYlGn",
+                center=0,
+                annot=True,
+                fmt=".3f",
+                ax=ax,
+            )
+            ax.set_title("Mean Return % by Month and Day")
+            ax.set_xlabel("Month")
+            ax.set_ylabel("Day")
+            plt.tight_layout()
+            plt.show()
+
         return significant
 
     def stats_session(self, visualization: bool = False):
