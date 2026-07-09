@@ -63,6 +63,10 @@ class Seasonality:
                 df["Session"] = df["Hour"].apply(assign_session)
                 df = df.dropna(subset=["Session"])
 
+        # Exclude weekend data
+        if "Weekday" in df.columns:
+            df = df[~df["Weekday"].isin(["Saturday", "Sunday"])]
+
         results = []
         for name, group in df.groupby(group_cols):
             returns = group["Return"]
@@ -81,12 +85,13 @@ class Seasonality:
                 }
             )
 
-        stats = pd.DataFrame(results)
+        stats = pd.DataFrame(results).sort_values("T-stats", key=abs, ascending=False)
         significant = stats[(abs(stats["T-stats"]) > 2) & (stats["P-value"] < 0.05)]
         return significant, stats
 
     def stats_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Hour")
+        print(significant.head(10))
 
         if plot:
             fig, ax = plt.subplots(1, 2, figsize=(12, 8))
@@ -114,6 +119,7 @@ class Seasonality:
 
     def stats_weekday(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Weekday")
+        print(significant.head(10))
 
         if plot:
             # Order weekdays properly
@@ -159,29 +165,61 @@ class Seasonality:
 
         return significant
 
-    def stats_weekday_hour(self, visualization: bool = False):
+    def stats_weekday_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Weekday", "Hour"])
+        print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Weekday", "Hour"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Pivot for heatmap
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            pivot = stats.pivot_table(
+                values="Mean Return %",
+                index="Hour",
+                columns="Weekday",
+                aggfunc="first",
+            )
+            pivot = pivot[weekday_order]
+
+            fig, ax = plt.subplots(figsize=(12, 8))
+            sns.heatmap(
+                pivot,
+                cmap="RdYlGn",
+                center=0,
+                annot=True,
+                fmt=".3f",
+                ax=ax,
+            )
+            ax.set_title("Mean Return % by Hour and Weekday")
+            ax.set_ylabel("Hour")
+            ax.set_xlabel("Weekday")
+            plt.tight_layout()
+            plt.show()
 
         return significant
 
     def stats_month(self, visualization: bool = False):
         significant, stats = self.seasonality_stats("Month")
-
+        print(significant.head(10))
         return significant
 
     def stats_month_day(self, visualization: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Day"])
-
+        print(significant.head(10))
         return significant
 
     def stats_session(self, visualization: bool = False):
         significant, stats = self.seasonality_stats("Session")
-
+        print(significant.head(10))
         return significant
 
     def stats_session_weekday(self, visualization: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Weekday"])
-
+        print(significant.head(10))
         return significant
 
 
