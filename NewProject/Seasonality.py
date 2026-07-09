@@ -112,8 +112,50 @@ class Seasonality:
 
         return significant
 
-    def stats_weekday(self, visualization: bool = False):
+    def stats_weekday(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Weekday")
+
+        if plot:
+            # Order weekdays properly
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            stats = stats[stats["Group"].isin(weekday_order)]
+            stats["Group"] = pd.Categorical(
+                stats["Group"], categories=weekday_order, ordered=True
+            )
+            stats = stats.sort_values("Group")
+
+            fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+
+            ax[0, 0].plot(stats["Group"], stats["Mean Return %"], marker="o")
+            ax[0, 0].axhline(0, linestyle="--", color="gray")
+            ax[0, 0].set_title("Mean Return by Weekday (Line)")
+            ax[0, 0].set_ylabel("Mean Return %")
+            ax[0, 0].grid(True)
+            ax[0, 0].tick_params(axis="x", rotation=45)
+
+            ax[0, 1].plot(stats["Group"], stats["Median Return %"], marker="o")
+            ax[0, 1].axhline(0, linestyle="--", color="gray")
+            ax[0, 1].set_title("Median Return by Weekday (Line)")
+            ax[0, 1].set_ylabel("Median Return %")
+            ax[0, 1].grid(True)
+            ax[0, 1].tick_params(axis="x", rotation=45)
+
+            ax[1, 0].bar(stats["Group"], stats["Mean Return %"])
+            ax[1, 0].axhline(0, linestyle="--", color="gray")
+            ax[1, 0].set_title("Mean Return by Weekday (Bar)")
+            ax[1, 0].set_ylabel("Mean Return %")
+            ax[1, 0].grid(True)
+            ax[1, 0].tick_params(axis="x", rotation=45)
+
+            ax[1, 1].bar(stats["Group"], stats["Median Return %"])
+            ax[1, 1].axhline(0, linestyle="--", color="gray")
+            ax[1, 1].set_title("Median Return by Weekday (Bar)")
+            ax[1, 1].set_ylabel("Median Return %")
+            ax[1, 1].grid(True)
+            ax[1, 1].tick_params(axis="x", rotation=45)
+
+            plt.tight_layout()
+            plt.show()
 
         return significant
 
