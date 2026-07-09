@@ -29,6 +29,22 @@ class Seasonality:
         df_D = df_D.dropna()
         return df_D[["Return", "Weekday"]]
 
+    @property
+    def AsianSession(self) -> str:
+        return "Asian Session: 1->9"
+
+    @property
+    def LondonSession(self) -> str:
+        return "London Session: 10->13"
+
+    @property
+    def OverlapSession(self) -> str:
+        return "Overlap Session: 14->18"
+
+    @property
+    def NewYorkSession(self) -> str:
+        return "NewYork Session: 19->23"
+
     def seasonality_stats(self, group_cols):
         df = self.return_1h.copy()
 
@@ -92,7 +108,6 @@ class Seasonality:
 
     def stats_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Hour")
-        print(significant.head(10))
 
         if plot:
             fig, ax = plt.subplots(1, 2, figsize=(12, 8))
@@ -116,11 +131,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_weekday(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Weekday")
-        print(significant.head(10))
 
         if plot:
             # Order weekdays properly
@@ -164,11 +178,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_weekday_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Weekday", "Hour"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -201,11 +214,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_month(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Month")
-        print(significant.head(10))
 
         if plot:
             fig, ax = plt.subplots(1, 2, figsize=(12, 8))
@@ -229,11 +241,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_month_day(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Day"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -264,11 +275,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_monthday(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Day")
-        print(significant.head(10))
 
         if plot:
             fig, ax = plt.subplots(1, 2, figsize=(20, 8))
@@ -294,11 +304,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_session(self, plot: bool = False):
         significant, stats = self.seasonality_stats("Session")
-        print(significant.head(10))
 
         if plot:
             # Order sessions properly
@@ -341,11 +350,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_session_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Hour"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -373,11 +381,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_session_weekday(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Weekday"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -412,11 +419,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_session_weekday_hour(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Weekday", "Hour"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -464,11 +470,10 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
 
     def stats_weekday_hour_month(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Weekday", "Hour"])
-        print(significant.head(10))
 
         if plot:
             # Split tuple Group into separate columns
@@ -479,7 +484,7 @@ class Seasonality:
             # Order weekdays properly
             weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
 
-            fig, ax = plt.subplots(2, 3, figsize=(18, 10))
+            fig, ax = plt.subplots(2, 3, figsize=(25, 10))
 
             for i, weekday in enumerate(weekday_order):
                 row, col = i // 3, i % 3
@@ -509,12 +514,86 @@ class Seasonality:
             plt.tight_layout()
             plt.show()
 
-        return significant
+        return significant.head(10)
+
+    def stats_weekday_month(self, plot: bool = False):
+        significant, stats = self.seasonality_stats(["Weekday", "Month"])
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Weekday", "Month"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Pivot for heatmap
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            pivot = stats.pivot_table(
+                values="Mean Return %",
+                index="Month",
+                columns="Weekday",
+                aggfunc="first",
+            )
+            pivot = pivot[weekday_order]
+
+            fig, ax = plt.subplots(figsize=(12, 8))
+            sns.heatmap(
+                pivot,
+                cmap="RdYlGn",
+                center=0,
+                annot=True,
+                fmt=".3f",
+                ax=ax,
+            )
+            ax.set_title("Mean Return % by Month and Weekday")
+            ax.set_xlabel("Weekday")
+            ax.set_ylabel("Month")
+            plt.tight_layout()
+            plt.show()
+
+        return significant.head(10)
 
     def stats_month_session_weekday(self, plot: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Weekday", "Session"])
-        print(significant.head(10))
-        return significant
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Month", "Weekday", "Session"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Order weekdays and sessions properly
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            session_order = ["Asian", "London", "Overlap", "New York"]
+
+            fig, ax = plt.subplots(2, 2, figsize=(14, 10))
+
+            for i, session in enumerate(session_order):
+                row, col = i // 2, i % 2
+                session_data = stats[stats["Session"] == session]
+                pivot = session_data.pivot_table(
+                    values="Mean Return %",
+                    index="Month",
+                    columns="Weekday",
+                    aggfunc="first",
+                )
+                pivot = pivot.reindex(columns=weekday_order)
+
+                sns.heatmap(
+                    pivot,
+                    cmap="RdYlGn",
+                    center=0,
+                    annot=True,
+                    fmt=".3f",
+                    ax=ax[row, col],
+                )
+                ax[row, col].set_title(f"{session} Session")
+                ax[row, col].set_xlabel("Weekday")
+                ax[row, col].set_ylabel("Month")
+
+            plt.tight_layout()
+            plt.show()
+
+        return significant.head(10)
 
 
 if __name__ == "__main__":
