@@ -414,6 +414,108 @@ class Seasonality:
 
         return significant
 
+    def stats_session_weekday_hour(self, plot: bool = False):
+        significant, stats = self.seasonality_stats(["Session", "Weekday", "Hour"])
+        print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Session", "Weekday", "Hour"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Order weekdays properly
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            session_order = ["Asian", "London", "Overlap", "New York"]
+
+            # Define hour ranges for each session
+            session_hours = {
+                "Asian": range(1, 10),
+                "London": range(10, 14),
+                "Overlap": range(14, 19),
+                "New York": range(19, 24),
+            }
+
+            fig, ax = plt.subplots(2, 2, figsize=(14, 10))
+
+            for i, session in enumerate(session_order):
+                row, col = i // 2, i % 2
+                session_data = stats[stats["Session"] == session]
+                pivot = session_data.pivot_table(
+                    values="Mean Return %",
+                    index="Hour",
+                    columns="Weekday",
+                    aggfunc="first",
+                )
+                pivot = pivot.reindex(columns=weekday_order)
+
+                sns.heatmap(
+                    pivot,
+                    cmap="RdYlGn",
+                    center=0,
+                    annot=True,
+                    fmt=".3f",
+                    ax=ax[row, col],
+                )
+                ax[row, col].set_title(f"{session} Session")
+                ax[row, col].set_xlabel("Weekday")
+                ax[row, col].set_ylabel("Hour")
+
+            plt.tight_layout()
+            plt.show()
+
+        return significant
+
+    def stats_weekday_hour_month(self, plot: bool = False):
+        significant, stats = self.seasonality_stats(["Month", "Weekday", "Hour"])
+        print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Month", "Weekday", "Hour"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
+            # Order weekdays properly
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+
+            fig, ax = plt.subplots(2, 3, figsize=(18, 10))
+
+            for i, weekday in enumerate(weekday_order):
+                row, col = i // 3, i % 3
+                weekday_data = stats[stats["Weekday"] == weekday]
+                pivot = weekday_data.pivot_table(
+                    values="Mean Return %",
+                    index="Hour",
+                    columns="Month",
+                    aggfunc="first",
+                )
+
+                sns.heatmap(
+                    pivot,
+                    cmap="RdYlGn",
+                    center=0,
+                    annot=True,
+                    fmt=".3f",
+                    ax=ax[row, col],
+                )
+                ax[row, col].set_title(f"{weekday}")
+                ax[row, col].set_xlabel("Month")
+                ax[row, col].set_ylabel("Hour")
+
+            # Hide the 6th subplot
+            ax[1, 2].set_visible(False)
+
+            plt.tight_layout()
+            plt.show()
+
+        return significant
+
+    def stats_month_session_weekday(self, plot: bool = False):
+        significant, stats = self.seasonality_stats(["Month", "Weekday", "Session"])
+        print(significant.head(10))
+        return significant
+
 
 if __name__ == "__main__":
     df_1h = pd.read_csv(
