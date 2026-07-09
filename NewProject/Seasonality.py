@@ -266,8 +266,43 @@ class Seasonality:
 
         return significant
 
+    def stats_monthday(self, plot: bool = False):
+        significant, stats = self.seasonality_stats("Day")
+        print(significant.head(10))
+
+        if plot:
+            fig, ax = plt.subplots(1, 2, figsize=(20, 8))
+
+            ax[0].plot(stats["Group"], stats["Mean Return %"], marker="o")
+            ax[0].axhline(0, linestyle="--", color="gray")
+            ax[0].set_title("Mean Return by Day of Month")
+            ax[0].set_xlabel("Day")
+            ax[0].set_ylabel("Mean Return %")
+            ax[0].set_xticks(range(1, 32))
+            ax[0].tick_params(axis="x", rotation=90)
+            ax[0].grid(True)
+
+            ax[1].plot(stats["Group"], stats["Median Return %"], marker="o")
+            ax[1].axhline(0, linestyle="--", color="gray")
+            ax[1].set_title("Median Return by Day of Month")
+            ax[1].set_xlabel("Day")
+            ax[1].set_ylabel("Median Return %")
+            ax[1].set_xticks(range(1, 32))
+            ax[1].tick_params(axis="x", rotation=90)
+            ax[1].grid(True)
+
+            plt.tight_layout()
+            plt.show()
+
+        return significant
+
     def stats_session(self, visualization: bool = False):
         significant, stats = self.seasonality_stats("Session")
+        print(significant.head(10))
+        return significant
+
+    def stats_session_hour(self, visualization: bool = False):
+        significant, stats = self.seasonality_stats(["Session", "Hour"])
         print(significant.head(10))
         return significant
 
