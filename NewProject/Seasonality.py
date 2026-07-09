@@ -2,6 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_1samp
+from pathlib import Path
+
+base_dir = Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Graph")
 
 
 class Seasonality:
@@ -106,7 +109,7 @@ class Seasonality:
         significant = significant.sort_values("T-stats", key=abs, ascending=False)
         return significant, stats
 
-    def stats_hour(self, plot: bool = False):
+    def stats_hour(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats("Hour")
 
         if plot:
@@ -129,11 +132,13 @@ class Seasonality:
             ax[1].grid(True)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "Hour.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_weekday(self, plot: bool = False):
+    def stats_weekday(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats("Weekday")
 
         if plot:
@@ -176,11 +181,13 @@ class Seasonality:
             ax[1, 1].tick_params(axis="x", rotation=45)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_weekday.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_weekday_hour(self, plot: bool = False):
+    def stats_weekday_hour(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Weekday", "Hour"])
 
         if plot:
@@ -212,11 +219,13 @@ class Seasonality:
             ax.set_ylabel("Hour")
             ax.set_xlabel("Weekday")
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_weekday_hour.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_month(self, plot: bool = False):
+    def stats_month(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats("Month")
 
         if plot:
@@ -239,11 +248,13 @@ class Seasonality:
             ax[1].grid(True)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_month.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_month_day(self, plot: bool = False):
+    def stats_month_day(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Day"])
 
         if plot:
@@ -273,11 +284,13 @@ class Seasonality:
             ax.set_xlabel("Month")
             ax.set_ylabel("Day")
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_month_day.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_monthday(self, plot: bool = False):
+    def stats_monthday(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats("Day")
 
         if plot:
@@ -302,11 +315,13 @@ class Seasonality:
             ax[1].grid(True)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_monthday.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_session(self, plot: bool = False):
+    def stats_session(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats("Session")
 
         if plot:
@@ -348,11 +363,13 @@ class Seasonality:
             ax[1, 1].tick_params(axis="x", rotation=45)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_session.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_session_hour(self, plot: bool = False):
+    def stats_session_hour(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Hour"])
 
         if plot:
@@ -379,11 +396,13 @@ class Seasonality:
                 ax[row, col].grid(True)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_session_hour.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_session_weekday(self, plot: bool = False):
+    def stats_session_weekday(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Weekday"])
 
         if plot:
@@ -417,11 +436,13 @@ class Seasonality:
             ax.set_xlabel("Session")
             ax.set_ylabel("Weekday")
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_session_weekday.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_session_weekday_hour(self, plot: bool = False):
+    def stats_session_weekday_hour(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Session", "Weekday", "Hour"])
 
         if plot:
@@ -468,11 +489,13 @@ class Seasonality:
                 ax[row, col].set_ylabel("Hour")
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_session_weekday_hour.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_weekday_hour_month(self, plot: bool = False):
+    def stats_weekday_hour_month(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Weekday", "Hour"])
 
         if plot:
@@ -512,11 +535,13 @@ class Seasonality:
             ax[1, 2].set_visible(False)
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_weekday_hour_month.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_weekday_month(self, plot: bool = False):
+    def stats_weekday_month(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Weekday", "Month"])
 
         if plot:
@@ -548,11 +573,13 @@ class Seasonality:
             ax.set_xlabel("Weekday")
             ax.set_ylabel("Month")
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_weekday_month.png", dpi=300)
             plt.show()
 
         return significant.head(10)
 
-    def stats_month_session_weekday(self, plot: bool = False):
+    def stats_month_session_weekday(self, plot: bool = True, save_file: bool = False):
         significant, stats = self.seasonality_stats(["Month", "Weekday", "Session"])
 
         if plot:
@@ -591,6 +618,8 @@ class Seasonality:
                 ax[row, col].set_ylabel("Month")
 
             plt.tight_layout()
+            if save_file:
+                fig.savefig(base_dir / "stats_month_session_weekday.png", dpi=300)
             plt.show()
 
         return significant.head(10)
