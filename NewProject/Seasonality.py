@@ -353,14 +353,48 @@ class Seasonality:
                 stats["Group"].tolist(), index=stats.index
             )
 
+            # Order sessions properly
+            session_order = ["Asian", "London", "Overlap", "New York"]
+
+            fig, ax = plt.subplots(2, 2, figsize=(12, 6))
+
+            for i, session in enumerate(session_order):
+                row, col = i // 2, i % 2
+                session_data = stats[stats["Session"] == session]
+                ax[row, col].plot(
+                    session_data["Hour"], session_data["Mean Return %"], marker="o"
+                )
+                ax[row, col].axhline(0, linestyle="--", color="gray")
+                ax[row, col].set_title(f"{session} Session - Mean Return by Hour")
+                ax[row, col].set_xlabel("Hour")
+                ax[row, col].set_ylabel("Mean Return %")
+                ax[row, col].grid(True)
+
+            plt.tight_layout()
+            plt.show()
+
+        return significant
+
+    def stats_session_weekday(self, plot: bool = False):
+        significant, stats = self.seasonality_stats(["Session", "Weekday"])
+        print(significant.head(10))
+
+        if plot:
+            # Split tuple Group into separate columns
+            stats[["Session", "Weekday"]] = pd.DataFrame(
+                stats["Group"].tolist(), index=stats.index
+            )
+
             # Pivot for heatmap
-            session_order = ["Asian", "London", "New York", "Overlap"]
+            session_order = ["Asian", "London", "Overlap", "New York"]
+            weekday_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
             pivot = stats.pivot_table(
                 values="Mean Return %",
-                index="Hour",
+                index="Weekday",
                 columns="Session",
                 aggfunc="first",
             )
+            pivot = pivot.reindex(weekday_order)
             pivot = pivot[session_order]
 
             fig, ax = plt.subplots(figsize=(12, 8))
@@ -372,17 +406,12 @@ class Seasonality:
                 fmt=".3f",
                 ax=ax,
             )
-            ax.set_title("Mean Return % by Session and Hour")
+            ax.set_title("Mean Return % by Session and Weekday")
             ax.set_xlabel("Session")
-            ax.set_ylabel("Hour")
+            ax.set_ylabel("Weekday")
             plt.tight_layout()
             plt.show()
 
-        return significant
-
-    def stats_session_weekday(self, visualization: bool = False):
-        significant, stats = self.seasonality_stats(["Session", "Weekday"])
-        print(significant.head(10))
         return significant
 
 
