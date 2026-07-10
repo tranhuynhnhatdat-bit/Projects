@@ -4,12 +4,12 @@ import seaborn as sns
 from scipy.stats import ttest_1samp
 from pathlib import Path
 
-base_dir = Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Graph")
-
 
 class Seasonality:
-    def __init__(self, df_1h: pd.DataFrame):
+    def __init__(self, df_1h: pd.DataFrame, image_dir: Path, metric_dir: Path):
         self._df_1h = df_1h
+        self.image_dir = image_dir
+        self.metric_dir = metric_dir
         self._df_D = (
             self._df_1h.resample("D")
             .agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"})
@@ -133,7 +133,8 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "Hour.png", dpi=300)
+                fig.savefig(self.image_dir / "Hour.png", dpi=300)
+                significant.head(10).to_csv(self.metric_dir / "Hour.csv", index=False)
             plt.show()
 
         return significant.head(10)
@@ -182,7 +183,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_weekday.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_weekday.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_weekday.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -220,7 +224,10 @@ class Seasonality:
             ax.set_xlabel("Weekday")
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_weekday_hour.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_weekday_hour.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_weekday_hour.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -249,7 +256,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_month.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_month.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_month.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -285,7 +295,10 @@ class Seasonality:
             ax.set_ylabel("Day")
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_month_day.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_month_day.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_month_day.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -316,7 +329,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_monthday.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_monthday.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_monthday.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -364,7 +380,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_session.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_session.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_session.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -397,7 +416,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_session_hour.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_session_hour.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_session_hour.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -437,7 +459,10 @@ class Seasonality:
             ax.set_ylabel("Weekday")
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_session_weekday.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_session_weekday.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_session_weekday.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -490,7 +515,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_session_weekday_hour.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_session_weekday_hour.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_session_weekday_hour.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -536,7 +564,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_weekday_hour_month.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_weekday_hour_month.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_weekday_hour_month.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -574,7 +605,10 @@ class Seasonality:
             ax.set_ylabel("Month")
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_weekday_month.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_weekday_month.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_weekday_month.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -619,7 +653,10 @@ class Seasonality:
 
             plt.tight_layout()
             if save_file:
-                fig.savefig(base_dir / "stats_month_session_weekday.png", dpi=300)
+                fig.savefig(self.image_dir / "stats_month_session_weekday.png", dpi=300)
+                significant.head(10).to_csv(
+                    self.metric_dir / "stats_month_session_weekday.csv", index=False
+                )
             plt.show()
 
         return significant.head(10)
@@ -631,4 +668,8 @@ if __name__ == "__main__":
         index_col=0,
         parse_dates=True,
     )
-    season = Seasonality(df_1h)
+    season = Seasonality(
+        df_1h,
+        image_dir=Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Graph"),
+        metric_dir=Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Metrics"),
+    )
