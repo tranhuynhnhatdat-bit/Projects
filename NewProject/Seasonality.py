@@ -6,10 +6,10 @@ from pathlib import Path
 
 
 class Seasonality:
-    def __init__(self, df_1h: pd.DataFrame, image_dir: Path, metric_dir: Path):
+    def __init__(self, df_1h: pd.DataFrame, image_dir: str, metric_dir: str):
         self._df_1h = df_1h
-        self.image_dir = image_dir
-        self.metric_dir = metric_dir
+        self.image_dir = Path(image_dir)
+        self.metric_dir = Path(metric_dir)
         self._df_D = (
             self._df_1h.resample("D")
             .agg({"Open": "first", "High": "max", "Low": "min", "Close": "last"})
@@ -670,6 +670,6 @@ if __name__ == "__main__":
     )
     season = Seasonality(
         df_1h,
-        image_dir=Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Graph"),
-        metric_dir=Path(r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Metrics"),
+        image_dir=r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Graph",
+        metric_dir=r"C:\Users\Mr.Dat\Desktop\Projects\Pattern\Gold\Metrics",
     )
