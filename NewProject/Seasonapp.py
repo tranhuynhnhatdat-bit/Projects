@@ -3,9 +3,7 @@ from GettingData import getting_data_mt5
 import MetaTrader5 as mt5
 from dash import Dash, html, dcc, Output, Input, State, callback
 import dash_ag_grid as dag
-import plotly.express as px
 import plotly.graph_objects as go
-import MetaTrader5 as mt5
 import pandas as pd
 from Metrics import Asset_Metrics
 
@@ -16,6 +14,22 @@ if not mt5.initialize():
 visible_symbols = mt5.symbols_get()
 market_watch_list = [s.name for s in visible_symbols if s.visible]
 
+# Mapping of user-friendly labels to PlotlySeason method names
+STATS_FUNCTIONS = {
+    "Hourly Seasonality": "stats_hour",
+    "Weekday Seasonality": "stats_weekday",
+    "Weekday × Hour Heatmap": "stats_weekday_hour",
+    "Monthly Seasonality": "stats_month",
+    "Month × Day Heatmap": "stats_month_day",
+    "Day of Month Seasonality": "stats_monthday",
+    "Session Seasonality": "stats_session",
+    "Session × Hour": "stats_session_hour",
+    "Session × Weekday Heatmap": "stats_session_weekday",
+    "Session × Weekday × Hour Heatmaps": "stats_session_weekday_hour",
+    "Weekday × Hour × Month Heatmaps": "stats_weekday_hour_month",
+    "Month × Weekday Heatmap": "stats_weekday_month",
+    "Month × Session × Weekday Heatmaps": "stats_month_session_weekday",
+}
 
 app = Dash()
 
@@ -26,12 +40,12 @@ app.layout = html.Div(
         html.H1(
             "Seasonality Pattern",
             style={
-                "color": "#00FFCC",  # Sleek neon cyan/teal text accent
+                "color": "#00FFCC",
                 "textAlign": "center",
                 "fontFamily": "Inter, Helvetica, Arial, sans-serif",
-                "fontWeight": "700",  # Makes the title bold and crisp
-                "letterSpacing": "1px",  # Adds a premium, modern feel
-                "marginBottom": "30px",  # Pushes the dropdown away cleanly
+                "fontWeight": "700",
+                "letterSpacing": "1px",
+                "marginBottom": "30px",
             },
         ),
         dropdown_input := dcc.Dropdown(options=market_watch_list, value="XAUUSD"),
@@ -41,13 +55,45 @@ app.layout = html.Div(
             id="years-slider",
         ),
         html.Div(id="asset-metrics-output", style={"marginTop": "30px"}),
+        html.Hr(style={"borderColor": "#334155", "margin": "30px 0"}),
+        html.H3(
+            "Seasonality Pattern Analysis",
+            style={"color": "#00FFCC", "marginBottom": "15px"},
+        ),
+        dcc.Dropdown(
+            id="stats-function-dropdown",
+            options=[{"label": k, "value": v} for k, v in STATS_FUNCTIONS.items()],
+            multi=True,
+            placeholder="Select seasonality patterns to analyze...",
+            style={
+                "color": "#0F172A",
+                "marginBottom": "15px",
+            },
+        ),
+        html.Button(
+            "Run Seasonality Analysis",
+            id="submit-stats-btn",
+            n_clicks=0,
+            style={
+                "backgroundColor": "#00FFCC",
+                "color": "#0F172A",
+                "fontWeight": "bold",
+                "padding": "10px 24px",
+                "border": "none",
+                "borderRadius": "6px",
+                "cursor": "pointer",
+                "fontSize": "16px",
+                "marginBottom": "30px",
+            },
+        ),
+        html.Div(id="asset-seasonality-output", style={"marginTop": "20px"}),
     ],
     style={
-        "backgroundColor": "#0F172A",  # Midnight navy/slate slate (smooth dark mode)
-        "minHeight": "100vh",  # Spans the entire screen height
-        "margin": "-8px",  # Removes default white edge gaps
-        "padding": "40px 20px",  # Gives elements plenty of breathing room
-        "fontFamily": "Inter, Helvetica, Arial, sans-serif",  # Applies modern font everywhere
+        "backgroundColor": "#0F172A",
+        "minHeight": "100vh",
+        "margin": "-8px",
+        "padding": "40px 20px",
+        "fontFamily": "Inter, Helvetica, Arial, sans-serif",
     },
 )
 
@@ -190,6 +236,124 @@ def update_metrics(selected_years, cached_data):
             ),
             grid,
         ]
+    )
+
+
+# Run seasonality analysis on button click
+@callback(
+    Output("asset-seasonality-output", "children"),
+    Input("submit-stats-btn", "n_clicks"),
+    State("stats-function-dropdown", "value"),
+    State("store_data_H1", "data"),
+)
+def run_seasonality_analysis(n_clicks, selected_funcs, h1_data):
+    if n_clicks == 0 or not selected_funcs or h1_data is None:
+        return html.Div()
+
+    # Load and prepare hourly data
+    df = pd.DataFrame(h1_data)
+    df["DateTime"] = pd.to_datetime(df["DateTime"])
+    df = df.set_index("DateTime")
+
+    # Ensure we have enough data
+    if df.empty:
+        return html.Div("No data available.", style={"color": "#888"})
+
+    season = PlotlySeason(df)
+
+    tabs = []
+    reverse_label_map = {v: k for k, v in STATS_FUNCTIONS.items()}
+
+    for func_name in selected_funcs:
+        try:
+            fig, significant_df = getattr(season, func_name)(show_chart=False)
+
+            # Build AgGrid from significant dataframe
+            sig_columns = [
+                {"field": col, "sortable": True, "filter": True}
+                for col in significant_df.columns
+            ]
+            sig_rows = significant_df.to_dict("records")
+
+            label = reverse_label_map.get(func_name, func_name)
+
+            tab_content = html.Div(
+                children=[
+                    dcc.Graph(figure=fig),
+                    html.H4(
+                        label,
+                        style={
+                            "color": "#00FFCC",
+                            "marginTop": "15px",
+                            "marginBottom": "10px",
+                        },
+                    ),
+                    dag.AgGrid(
+                        rowData=sig_rows,
+                        columnDefs=sig_columns,
+                        defaultColDef={
+                            "resizable": True,
+                            "sortable": True,
+                            "filter": True,
+                        },
+                        dashGridOptions={"domLayout": "autoHeight"},
+                        style={"height": None},
+                    ),
+                ],
+                style={"padding": "15px"},
+            )
+
+            tabs.append(
+                dcc.Tab(
+                    label=label,
+                    children=[tab_content],
+                    style={
+                        "backgroundColor": "#1E293B",
+                        "color": "#94A3B8",
+                        "border": "1px solid #334155",
+                        "padding": "8px 16px",
+                    },
+                    selected_style={
+                        "backgroundColor": "#0F172A",
+                        "color": "#00FFCC",
+                        "borderTop": "2px solid #00FFCC",
+                        "fontWeight": "bold",
+                    },
+                )
+            )
+
+        except Exception as e:
+            tabs.append(
+                dcc.Tab(
+                    label=reverse_label_map.get(func_name, func_name),
+                    children=[
+                        html.Div(
+                            f"Error running {func_name}: {str(e)}",
+                            style={"color": "#FF6B6B", "padding": "20px"},
+                        )
+                    ],
+                    style={
+                        "backgroundColor": "#1E293B",
+                        "color": "#94A3B8",
+                        "border": "1px solid #334155",
+                    },
+                    selected_style={
+                        "backgroundColor": "#0F172A",
+                        "color": "#FF6B6B",
+                        "borderTop": "2px solid #FF6B6B",
+                    },
+                )
+            )
+
+    if not tabs:
+        return html.Div(
+            "No seasonality patterns selected.",
+            style={"color": "#888", "marginTop": "10px"},
+        )
+
+    return dcc.Tabs(
+        children=tabs,
+        style={"marginTop": "10px"},
     )
 
 
