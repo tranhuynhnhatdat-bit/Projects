@@ -1,5 +1,3 @@
-import streamlit as st
-import os
 from GettingData import getting_data_mt5
 import MetaTrader5 as mt5
 import pandas as pd
