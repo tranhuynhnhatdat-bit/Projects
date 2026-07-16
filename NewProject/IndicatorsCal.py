@@ -125,10 +125,10 @@ class IndicatorCal:
     def StdDev(self, period=14):
         return talib.STDDEV(self._higher_df["Close"], period)
 
-    # ── Multi-output indicators (return new DataFrame without OHLC) ──
+    # ── Supertrend (each output as own Series) ──────────────────────
 
-    def Supertrend(self, period=14, multiplier=3.0):
-        """Return a new DataFrame with Supertrend_Direction and Supertrend_Signal columns."""
+    def SupertrendDirection(self, period=14, multiplier=3.0):
+        """Return Supertrend direction (1=bullish, -1=bearish, 0=neutral) as Series."""
         high = self._higher_df["High"].values
         low = self._higher_df["Low"].values
         close = self._higher_df["Close"].values
@@ -140,16 +140,24 @@ class IndicatorCal:
             period,
         ).values
 
-        direction, signal = self._supertrend_calc(
-            high, low, close, atr, period, multiplier
-        )
+        direction, _ = self._supertrend_calc(high, low, close, atr, period, multiplier)
+        return pd.Series(direction, index=self._higher_df.index)
 
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        result_df[f"Supertrend_Direction_{period}"] = direction
-        result_df[f"Supertrend_Signal_{period}"] = signal
-        return result_df
+    def SupertrendSignal(self, period=14, multiplier=3.0):
+        """Return Supertrend signal line as Series."""
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        close = self._higher_df["Close"].values
+
+        atr = talib.ATR(
+            self._higher_df["High"],
+            self._higher_df["Low"],
+            self._higher_df["Close"],
+            period,
+        ).values
+
+        _, signal = self._supertrend_calc(high, low, close, atr, period, multiplier)
+        return pd.Series(signal, index=self._higher_df.index)
 
     @staticmethod
     @njit
@@ -204,25 +212,42 @@ class IndicatorCal:
 
         return direction, signal
 
-    def Ichimoku(self, tenkan=9, kijun=26, senkou=52):
-        """Return a new DataFrame with Ichimoku cloud columns."""
+    # ── Ichimoku (each output as own Series) ────────────────────────
+
+    def IchimokuTenkan(self, tenkan=9, kijun=26, senkou=52):
         high = self._higher_df["High"].values
         low = self._higher_df["Low"].values
         close = self._higher_df["Close"].values
+        result = self._ichimoku_calc(high, low, close, tenkan, kijun, senkou)
+        return pd.Series(result[0], index=self._higher_df.index)
 
-        tenkan_line, kijun_line, senkou_a, senkou_b, chikou = self._ichimoku_calc(
-            high, low, close, tenkan, kijun, senkou
-        )
+    def IchimokuKijun(self, tenkan=9, kijun=26, senkou=52):
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        close = self._higher_df["Close"].values
+        result = self._ichimoku_calc(high, low, close, tenkan, kijun, senkou)
+        return pd.Series(result[1], index=self._higher_df.index)
 
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        result_df["Ichimoku_Tenkan"] = tenkan_line
-        result_df["Ichimoku_Kijun"] = kijun_line
-        result_df["Ichimoku_SenkouA"] = senkou_a
-        result_df["Ichimoku_SenkouB"] = senkou_b
-        result_df["Ichimoku_Chikou"] = chikou
-        return result_df
+    def IchimokuSenkouA(self, tenkan=9, kijun=26, senkou=52):
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        close = self._higher_df["Close"].values
+        result = self._ichimoku_calc(high, low, close, tenkan, kijun, senkou)
+        return pd.Series(result[2], index=self._higher_df.index)
+
+    def IchimokuSenkouB(self, tenkan=9, kijun=26, senkou=52):
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        close = self._higher_df["Close"].values
+        result = self._ichimoku_calc(high, low, close, tenkan, kijun, senkou)
+        return pd.Series(result[3], index=self._higher_df.index)
+
+    def IchimokuChikou(self, tenkan=9, kijun=26, senkou=52):
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        close = self._higher_df["Close"].values
+        result = self._ichimoku_calc(high, low, close, tenkan, kijun, senkou)
+        return pd.Series(result[4], index=self._higher_df.index)
 
     @staticmethod
     @njit
@@ -273,26 +298,43 @@ class IndicatorCal:
 
         return tenkan, kijun, senkou_a, senkou_b, chikou
 
+    # ── MACD (each output as own Series) ────────────────────────────
+
     def MACD(self, fastperiod=12, slowperiod=26, signalperiod=9):
-        """Return a new DataFrame with MACD line, signal line, and histogram."""
-        macd, signal, hist = talib.MACD(
+        """Return MACD line as Series."""
+        macd, _, _ = talib.MACD(
             self._higher_df["Close"],
             fastperiod=fastperiod,
             slowperiod=slowperiod,
             signalperiod=signalperiod,
         )
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        label = f"{fastperiod}_{slowperiod}_{signalperiod}"
-        result_df[f"MACD_{label}"] = macd
-        result_df[f"MACD_Signal_{label}"] = signal
-        result_df[f"MACD_Hist_{label}"] = hist
-        return result_df
+        return macd
 
-    def Stochastic(self, fastk_period=5, slowk_period=3, slowd_period=3):
-        """Return a new DataFrame with Stochastic %K and %D lines."""
-        slowk, slowd = talib.STOCH(
+    def MACDSignal(self, fastperiod=12, slowperiod=26, signalperiod=9):
+        """Return MACD signal line as Series."""
+        _, signal, _ = talib.MACD(
+            self._higher_df["Close"],
+            fastperiod=fastperiod,
+            slowperiod=slowperiod,
+            signalperiod=signalperiod,
+        )
+        return signal
+
+    def MACDHist(self, fastperiod=12, slowperiod=26, signalperiod=9):
+        """Return MACD histogram as Series."""
+        _, _, hist = talib.MACD(
+            self._higher_df["Close"],
+            fastperiod=fastperiod,
+            slowperiod=slowperiod,
+            signalperiod=signalperiod,
+        )
+        return hist
+
+    # ── Stochastic (each output as own Series) ──────────────────────
+
+    def StochK(self, fastk_period=5, slowk_period=3, slowd_period=3):
+        """Return Stochastic %K line as Series."""
+        slowk, _ = talib.STOCH(
             self._higher_df["High"],
             self._higher_df["Low"],
             self._higher_df["Close"],
@@ -302,65 +344,99 @@ class IndicatorCal:
             slowd_period=slowd_period,
             slowd_matype=0,
         )
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        label = f"{fastk_period}_{slowk_period}_{slowd_period}"
-        result_df[f"Stoch_K_{label}"] = slowk
-        result_df[f"Stoch_D_{label}"] = slowd
-        return result_df
+        return slowk
 
-    def BollingerBands(self, period=14, nbdevup=2, nbdevdn=2):
-        """Return a new DataFrame with Bollinger Bands upper, middle, and lower."""
-        upper, middle, lower = talib.BBANDS(
+    def StochD(self, fastk_period=5, slowk_period=3, slowd_period=3):
+        """Return Stochastic %D line as Series."""
+        _, slowd = talib.STOCH(
+            self._higher_df["High"],
+            self._higher_df["Low"],
+            self._higher_df["Close"],
+            fastk_period=fastk_period,
+            slowk_period=slowk_period,
+            slowk_matype=0,
+            slowd_period=slowd_period,
+            slowd_matype=0,
+        )
+        return slowd
+
+    # ── Bollinger Bands (each output as own Series) ─────────────────
+
+    def BBUpper(self, period=14, nbdevup=2, nbdevdn=2):
+        """Return Bollinger Bands upper line as Series."""
+        upper, _, _ = talib.BBANDS(
             self._higher_df["Close"],
             timeperiod=period,
             nbdevup=nbdevup,
             nbdevdn=nbdevdn,
             matype=0,
         )
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        result_df[f"BB_Upper_{period}"] = upper
-        result_df[f"BB_Middle_{period}"] = middle
-        result_df[f"BB_Lower_{period}"] = lower
-        return result_df
+        return upper
 
-    def KeltnerChannel(self, period=14, multiplier=2.0):
-        """Return a new DataFrame with Keltner Channel upper, middle (EMA), and lower."""
+    def BBMiddle(self, period=14, nbdevup=2, nbdevdn=2):
+        """Return Bollinger Bands middle line (SMA) as Series."""
+        _, middle, _ = talib.BBANDS(
+            self._higher_df["Close"],
+            timeperiod=period,
+            nbdevup=nbdevup,
+            nbdevdn=nbdevdn,
+            matype=0,
+        )
+        return middle
+
+    def BBLower(self, period=14, nbdevup=2, nbdevdn=2):
+        """Return Bollinger Bands lower line as Series."""
+        _, _, lower = talib.BBANDS(
+            self._higher_df["Close"],
+            timeperiod=period,
+            nbdevup=nbdevup,
+            nbdevdn=nbdevdn,
+            matype=0,
+        )
+        return lower
+
+    # ── Keltner Channel (each output as own Series) ─────────────────
+
+    def KCUpper(self, period=14, multiplier=2.0):
+        """Return Keltner Channel upper line as Series."""
         close = self._higher_df["Close"]
-        high = self._higher_df["High"]
-        low = self._higher_df["Low"]
-
         middle = talib.EMA(close, period)
-        atr = talib.ATR(high, low, close, period)
+        atr = talib.ATR(self._higher_df["High"], self._higher_df["Low"], close, period)
+        return middle + multiplier * atr
 
-        upper = middle + multiplier * atr
-        lower = middle - multiplier * atr
+    def KCMiddle(self, period=14, multiplier=2.0):
+        """Return Keltner Channel middle line (EMA) as Series."""
+        return talib.EMA(self._higher_df["Close"], period)
 
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        result_df[f"KC_Upper_{period}"] = upper
-        result_df[f"KC_Middle_{period}"] = middle
-        result_df[f"KC_Lower_{period}"] = lower
-        return result_df
+    def KCLower(self, period=14, multiplier=2.0):
+        """Return Keltner Channel lower line as Series."""
+        close = self._higher_df["Close"]
+        middle = talib.EMA(close, period)
+        atr = talib.ATR(self._higher_df["High"], self._higher_df["Low"], close, period)
+        return middle - multiplier * atr
 
-    def DonchianChannel(self, period=14):
-        """Return a new DataFrame with Donchian Channel upper, middle, and lower (numba)."""
+    # ── Donchian Channel (each output as own Series) ────────────────
+
+    def DonchianHigh(self, period=14):
+        """Return Donchian Channel upper (period high) as Series."""
         high = self._higher_df["High"].values
         low = self._higher_df["Low"].values
+        upper, _, _ = self._donchian_calc(high, low, period)
+        return pd.Series(upper, index=self._higher_df.index)
 
-        upper, middle, lower = self._donchian_calc(high, low, period)
+    def DonchianMiddle(self, period=14):
+        """Return Donchian Channel middle as Series."""
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        _, middle, _ = self._donchian_calc(high, low, period)
+        return pd.Series(middle, index=self._higher_df.index)
 
-        result_df = self._higher_df.copy().drop(
-            columns=["Open", "High", "Low", "Close"]
-        )
-        result_df[f"DC_Upper_{period}"] = upper
-        result_df[f"DC_Middle_{period}"] = middle
-        result_df[f"DC_Lower_{period}"] = lower
-        return result_df
+    def DonchianLow(self, period=14):
+        """Return Donchian Channel lower (period low) as Series."""
+        high = self._higher_df["High"].values
+        low = self._higher_df["Low"].values
+        _, _, lower = self._donchian_calc(high, low, period)
+        return pd.Series(lower, index=self._higher_df.index)
 
     @staticmethod
     @njit
@@ -489,6 +565,3 @@ class IndicatorCal:
             else:
                 result[i] = 0.0
         return result
-
-
-indicator = IndicatorCal(higher_df)
