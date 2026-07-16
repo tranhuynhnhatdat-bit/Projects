@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from backtesting import Strategy, Backtest
 
 
 class Asset_Metrics:
@@ -36,8 +35,7 @@ class Asset_Metrics:
         return sharpe
 
     def sortino_ratio(self, print_result: bool = False) -> float:
-        downside_return = self.daily_return.copy()
-        downside_return[downside_return > 0] = 0
+        downside_return = self.daily_return.where(self.daily_return <= 0, 0)
         downside_std = downside_return.std()
         if downside_std == 0.0:
             return 0.0
@@ -100,19 +98,25 @@ class Asset_Metrics:
 
     def max_stagnation_days(self, print_result: bool = False) -> int:
         prices = self._df[self._column]
-
         running_max = prices.cummax()
-
-        is_stagnant = prices < running_max
-
-        new_highs = (~is_stagnant).cumsum()
-
-        stagnant_durations = prices.groupby(new_highs).apply(
-            lambda x: (x.index[-1] - x.index[0]).days
-        )
+        is_stagnant = (prices < running_max).values
+        boundaries = np.diff(np.concatenate(([0], is_stagnant.astype(int), [0])))
+        run_starts = np.where(boundaries == 1)[0]
+        run_ends = np.where(boundaries == -1)[0]
+        if len(run_starts) > 0 and len(run_ends) > 0:
+            # Clip to valid index range to handle edge case where the
+            # stagnation run extends to the last data point (run_ends can
+            # contain index N which is out of bounds for a size-N array).
+            n = len(prices.index)
+            run_starts = np.clip(run_starts, 0, n - 1)
+            run_ends = np.clip(run_ends, 0, n - 1)
+            durations = prices.index[run_ends] - prices.index[run_starts]
+            max_dd = int(durations.max().days)
+        else:
+            max_dd = 0
         if print_result:
-            print(f"Stagnation in days: {int(stagnant_durations.max())}")
-        return int(stagnant_durations.max())
+            print(f"Stagnation in days: {max_dd}")
+        return max_dd
 
     def annualized_volatility(self, print_result: bool = False) -> float:
         daily_std = self.daily_return.std()
@@ -186,17 +190,26 @@ class Trade_Metrics:
     def __init__(
         self,
         asset_df: pd.DataFrame,
-        stats: pd.DataFrame,
+        pf,
         exit_or_entry_time: bool = True,
         initial_capital: float = 10000,
     ):
         self._asset_df = asset_df
-        self._trade_df = stats._trades[["PnL", "ReturnPct", "EntryTime", "ExitTime"]]
+        records = pf.trades.records
+        self._trade_df = pd.DataFrame(
+            {
+                "PnL": records["pnl"],
+                "ReturnPct": records["return"],
+                "EntryTime": asset_df.index[records["entry_idx"]],
+                "ExitTime": asset_df.index[records["exit_idx"]],
+            }
+        )
         self._exit_or_entry_time = exit_or_entry_time
         self._initial_capital = initial_capital
         self._equity_df = pd.DataFrame(index=self._asset_df.index)
         self._daily_return = None
         self._years = None
+        self._trade_return_pct = None
 
     def __getitem__(self, key: int):
         return self._trade_df.iloc[key]
@@ -224,6 +237,8 @@ class Trade_Metrics:
     @property
     def exit_equity(self) -> pd.Series:
         """Equity curve using exit timestamps to assign PnL."""
+        if "Exit_Equity" in self._equity_df.columns:
+            return self._equity_df["Exit_Equity"]
         exit_pnl = (
             self._trade_df.set_index("ExitTime")[["PnL"]]
             .reindex(self._asset_df.index)
@@ -236,6 +251,8 @@ class Trade_Metrics:
     @property
     def entry_equity(self) -> pd.Series:
         """Equity curve using entry timestamps to assign PnL."""
+        if "Entry_Equity" in self._equity_df.columns:
+            return self._equity_df["Entry_Equity"]
         entry_pnl = (
             self._trade_df.set_index("EntryTime")[["PnL"]]
             .reindex(self._asset_df.index)
@@ -271,7 +288,11 @@ class Trade_Metrics:
     @property
     def trade_return_pct(self) -> pd.Series:
         """Individual trade returns (non-zero), used for trade-level metrics."""
-        return self._trade_df["ReturnPct"][self._trade_df["ReturnPct"] != 0]
+        if self._trade_return_pct is None:
+            self._trade_return_pct = self._trade_df["ReturnPct"][
+                self._trade_df["ReturnPct"] != 0
+            ]
+        return self._trade_return_pct
 
     @property
     def average_win(self) -> float:
@@ -318,8 +339,7 @@ class Trade_Metrics:
         return sharpe
 
     def sortino_ratio(self, print_result: bool = False) -> float:
-        downside_return = self.daily_return.copy()
-        downside_return[downside_return > 0] = 0
+        downside_return = self.daily_return.where(self.daily_return <= 0, 0)
         downside_std = downside_return.std()
         if downside_std == 0.0:
             return 0.0
@@ -359,15 +379,24 @@ class Trade_Metrics:
     def max_stagnation_days(self, print_result: bool = False) -> int:
         equity = self.equity
         running_max = equity.cummax()
-        is_stagnant = equity < running_max
-        new_highs = (~is_stagnant).cumsum()
-
-        stagnant_durations = equity.groupby(new_highs).apply(
-            lambda x: (x.index[-1] - x.index[0]).days
-        )
+        is_stagnant = (equity < running_max).values
+        boundaries = np.diff(np.concatenate(([0], is_stagnant.astype(int), [0])))
+        run_starts = np.where(boundaries == 1)[0]
+        run_ends = np.where(boundaries == -1)[0]
+        if len(run_starts) > 0 and len(run_ends) > 0:
+            # Clip to valid index range to handle edge case where the
+            # stagnation run extends to the last data point (run_ends can
+            # contain index N which is out of bounds for a size-N array).
+            n = len(equity.index)
+            run_starts = np.clip(run_starts, 0, n - 1)
+            run_ends = np.clip(run_ends, 0, n - 1)
+            durations = equity.index[run_ends] - equity.index[run_starts]
+            max_dd = int(durations.max().days)
+        else:
+            max_dd = 0
         if print_result:
-            print(f"Stagnation in days: {int(stagnant_durations.max())}")
-        return int(stagnant_durations.max())
+            print(f"Stagnation in days: {max_dd}")
+        return max_dd
 
     def annualized_volatility(self, print_result: bool = False) -> float:
         daily_std = self.daily_return.std()
@@ -478,6 +507,8 @@ class Trade_Metrics:
 # ============================================================
 
 if __name__ == "__main__":
+    from backtesting import Strategy, Backtest
+
     df = pd.read_csv(
         r"C:\Users\Mr.Dat\Desktop\Projects\Data\2026.6.25XAUUSD_ftmo-H1-Forex_245.csv",
         index_col=0,
@@ -519,8 +550,9 @@ if __name__ == "__main__":
 
     print()
 
-    # Test Trade_Metrics with __str__
-    trade_metrics = Trade_Metrics(
-        df, stats, exit_or_entry_time=True, initial_capital=10000
-    )
-    print(trade_metrics)
+    # Test Trade_Metrics with __str__ (vectorbt portfolio)
+    # pf = vbt.Portfolio.from_orders(...)  # create your vectorbt portfolio
+    # trade_metrics = Trade_Metrics(
+    #     df, pf, exit_or_entry_time=True, initial_capital=10000
+    # )
+    # print(trade_metrics)
