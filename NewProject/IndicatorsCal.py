@@ -2,7 +2,6 @@ import talib
 import pandas as pd
 import numpy as np
 from numba import njit
-from Data.DataManager import DataManager
 
 
 class IndicatorCal:
